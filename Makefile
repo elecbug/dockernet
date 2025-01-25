@@ -9,7 +9,9 @@ build:
 
 up:
 	sudo docker-compose down || true
+	sudo rm -rf ./data || true
 	sudo docker-compose up
 
 down:
 	sudo docker-compose down
+	sudo rm -rf ./data

@@ -19,9 +19,6 @@ public class Program
             case "router": 
                 Program.device = new Router();
                 break;
-            case "switch": 
-                Program.device = new Switch();
-                break;
         }
     }
 }

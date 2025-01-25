@@ -18,4 +18,4 @@ RUN mkdir /app
 COPY bin/dockernet /app/dockernet
 WORKDIR /app
 
-CMD java dockernet.Program $DEVICE
+CMD java dockernet.Program $DEVICE > /app/data/$HOSTNAME.log

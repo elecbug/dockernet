@@ -2,6 +2,8 @@ version: '3.9'
 services:
   host1:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=host
     networks:
@@ -10,6 +12,8 @@ services:
 
   host2:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=host
     networks:
@@ -18,6 +22,8 @@ services:
 
   host3:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=host
     networks:
@@ -26,83 +32,374 @@ services:
 
   host4:
     image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=host
+    networks:
+      net4:
+        ipv4_address: 10.10.4.2
+
+  host5:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=host
+    networks:
+      net5:
+        ipv4_address: 10.10.5.2
+
+  host6:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=host
+    networks:
+      net6:
+        ipv4_address: 10.10.6.2
+
+  host7:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=host
+    networks:
+      net7:
+        ipv4_address: 10.10.7.2
+
+  host8:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=host
+    networks:
+      net8:
+        ipv4_address: 10.10.8.2
+
+  host9:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=host
+    networks:
+      net9:
+        ipv4_address: 10.10.9.2
+
+  host10:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=host
     networks:
       net10:
         ipv4_address: 10.10.10.2
 
-  host5:
-    image: dockernet
-    environment:
-      - DEVICE=host
-    networks:
-      net11:
-        ipv4_address: 10.10.11.2
-
+  # Routers
   router1:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=router
     networks:
       net1:
         ipv4_address: 10.10.1.3
-      net6:
-        ipv4_address: 10.10.6.3
-      net4:
-        ipv4_address: 10.10.4.2
+      net11:
+        ipv4_address: 10.10.11.2
+      net30:
+        ipv4_address: 10.10.30.3
+      net15:
+        ipv4_address: 10.10.15.4
 
   router2:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=router
     networks:
       net2:
         ipv4_address: 10.10.2.3
-      net4:
-        ipv4_address: 10.10.4.3
-      net5:
-        ipv4_address: 10.10.5.2
-      net7:
-        ipv4_address: 10.10.7.2
+      net12:
+        ipv4_address: 10.10.12.2
+      net29:
+        ipv4_address: 10.10.29.3
+      net17:
+        ipv4_address: 10.10.17.4
 
   router3:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=router
     networks:
       net3:
         ipv4_address: 10.10.3.3
-      net5:
-        ipv4_address: 10.10.5.3
-      net6:
-        ipv4_address: 10.10.6.2
-      net9:
-        ipv4_address: 10.10.9.2
-        
+      net13:
+        ipv4_address: 10.10.13.2
+      net28:
+        ipv4_address: 10.10.28.3
+      net19:
+        ipv4_address: 10.10.19.4
+
   router4:
     image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net4:
+        ipv4_address: 10.10.4.3
+      net14:
+        ipv4_address: 10.10.14.2
+      net27:
+        ipv4_address: 10.10.27.3
+      net21:
+        ipv4_address: 10.10.21.4
+
+  router5:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net5:
+        ipv4_address: 10.10.5.3
+      net15:
+        ipv4_address: 10.10.15.2
+      net26:
+        ipv4_address: 10.10.26.3
+      net23:
+        ipv4_address: 10.10.23.4
+
+  router6:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net6:
+        ipv4_address: 10.10.6.3
+      net16:
+        ipv4_address: 10.10.16.2
+      net25:
+        ipv4_address: 10.10.25.3
+      net26:
+        ipv4_address: 10.10.26.4
+
+  router7:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=router
     networks:
       net7:
         ipv4_address: 10.10.7.3
-      net8:
-        ipv4_address: 10.10.8.2
-      net10:
-        ipv4_address: 10.10.10.3
-        
-  router5:
+      net17:
+        ipv4_address: 10.10.17.2
+      net24:
+        ipv4_address: 10.10.24.3
+      net27:
+        ipv4_address: 10.10.27.4
+
+  router8:
     image: dockernet
+    volumes:
+      - ./data:/app/data
     environment:
       - DEVICE=router
     networks:
       net8:
         ipv4_address: 10.10.8.3
+      net18:
+        ipv4_address: 10.10.18.2
+      net23:
+        ipv4_address: 10.10.23.3
+      net29:
+        ipv4_address: 10.10.29.4
+
+  router9:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
       net9:
         ipv4_address: 10.10.9.3
+      net19:
+        ipv4_address: 10.10.19.2
+      net22:
+        ipv4_address: 10.10.22.3
+      net11:
+        ipv4_address: 10.10.11.5
+
+  router10:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net10:
+        ipv4_address: 10.10.10.3
+      net20:
+        ipv4_address: 10.10.20.2
+      net21:
+        ipv4_address: 10.10.21.3
+      net13:
+        ipv4_address: 10.10.13.5
+
+  router11:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net21:
+        ipv4_address: 10.10.21.2
+      net20:
+        ipv4_address: 10.10.20.3
+      net15:
+        ipv4_address: 10.10.15.5
+
+  router12:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net22:
+        ipv4_address: 10.10.22.2
+      net19:
+        ipv4_address: 10.10.19.3
+      net17:
+        ipv4_address: 10.10.17.5
+
+  router13:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net23:
+        ipv4_address: 10.10.23.2
+      net18:
+        ipv4_address: 10.10.18.3
+      net19:
+        ipv4_address: 10.10.19.5
+
+  router14:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net24:
+        ipv4_address: 10.10.24.2
+      net17:
+        ipv4_address: 10.10.17.3
+      net21:
+        ipv4_address: 10.10.21.5
+
+  router15:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net25:
+        ipv4_address: 10.10.25.2
+      net16:
+        ipv4_address: 10.10.16.3
+      net23:
+        ipv4_address: 10.10.23.5
+
+  router16:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net26:
+        ipv4_address: 10.10.26.2
+      net15:
+        ipv4_address: 10.10.15.3
+      net25:
+        ipv4_address: 10.10.25.5
+
+  router17:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net27:
+        ipv4_address: 10.10.27.2
+      net14:
+        ipv4_address: 10.10.14.3
+      net28:
+        ipv4_address: 10.10.28.5
+
+  router18:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net28:
+        ipv4_address: 10.10.28.2
+      net13:
+        ipv4_address: 10.10.13.3
+      net29:
+        ipv4_address: 10.10.29.5
+
+  router19:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net29:
+        ipv4_address: 10.10.29.2
+      net12:
+        ipv4_address: 10.10.12.3
+      net11:
+        ipv4_address: 10.10.11.6
+
+  router20:
+    image: dockernet
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DEVICE=router
+    networks:
+      net30:
+        ipv4_address: 10.10.30.2
       net11:
         ipv4_address: 10.10.11.3
+      net13:
+        ipv4_address: 10.10.13.6
 
 networks:
   net1:
@@ -160,3 +457,98 @@ networks:
     ipam:
       config:
         - subnet: 10.10.11.0/24
+  net12:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.12.0/24
+  net13:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.13.0/24
+  net14:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.14.0/24
+  net15:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.15.0/24
+  net16:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.16.0/24
+  net17:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.17.0/24
+  net18:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.18.0/24
+  net19:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.19.0/24
+  net20:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.20.0/24
+  net21:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.21.0/24
+  net22:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.22.0/24
+  net23:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.23.0/24
+  net24:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.24.0/24
+  net25:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.25.0/24
+  net26:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.26.0/24
+  net27:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.27.0/24
+  net28:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.28.0/24
+  net29:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.29.0/24
+  net30:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.30.0/24

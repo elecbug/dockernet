@@ -9,6 +9,7 @@ public class Router extends NetworkDevice {
     private static final int BROADCAST_PORT = 5000; // 브로드캐스트 통신 포트
     private final int delay; // 응답 딜레이(ms)
     private final ScheduledExecutorService scheduler; // 주기적인 브로드캐스트 및 업데이트를 위한 스케줄러
+    private final int SYNC_INTERVAL = 5;
 
     public Router() {
         this(new Random().nextInt(900) + 100); // 100~999ms 랜덤 딜레이
@@ -38,7 +39,7 @@ public class Router extends NetworkDevice {
     
     // 브로드캐스트 및 수신 작업 시작
     private void startBroadcastingAndListening() {
-        scheduler.scheduleAtFixedRate(this::sendRoutingTable, 0, 10, TimeUnit.SECONDS); // 10초 간격으로 브로드캐스트
+        scheduler.scheduleAtFixedRate(this::sendRoutingTable, 0, SYNC_INTERVAL, TimeUnit.SECONDS); // 10초 간격으로 브로드캐스트
         new Thread(this::listenForBroadcast).start(); // 브로드캐스트 수신
     }
 
@@ -64,7 +65,7 @@ public class Router extends NetworkDevice {
     // 라우팅 테이블 수신 및 병합
     private void listenForBroadcast() {
         try (DatagramSocket socket = new DatagramSocket(BROADCAST_PORT)) {
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[10240];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     
             while (true) {
@@ -190,9 +191,13 @@ public class Router extends NetworkDevice {
                 return;
             }
 
-            System.out.println("Destination\tDistance\tHops\tNext Hop");
+            System.out.printf("%-20s %-10s %-10s %-20s\n", "Destination", "Distance", "Hops", "Next Hop");
             for (Map.Entry<String, RouteInfo> entry : routingTable.entrySet()) {
-                System.out.println(entry.getKey() + "\t\t" + entry.getValue().getDistance() + "\t\t" + entry.getValue().getHops() + "\t\t" + entry.getValue().getNextHop());
+                System.out.printf("%-20s %-10d %-10d %-20s\n", 
+                                entry.getKey(), 
+                                entry.getValue().getDistance(), 
+                                entry.getValue().getHops(), 
+                                entry.getValue().getNextHop());
             }
         }
     }
