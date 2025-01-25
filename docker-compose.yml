@@ -24,6 +24,22 @@ services:
       net3:
         ipv4_address: 10.10.3.2
 
+  host4:
+    image: dockernet
+    environment:
+      - DEVICE=host
+    networks:
+      net10:
+        ipv4_address: 10.10.10.2
+
+  host5:
+    image: dockernet
+    environment:
+      - DEVICE=host
+    networks:
+      net11:
+        ipv4_address: 10.10.11.2
+
   router1:
     image: dockernet
     environment:
@@ -73,6 +89,8 @@ services:
         ipv4_address: 10.10.7.3
       net8:
         ipv4_address: 10.10.8.2
+      net10:
+        ipv4_address: 10.10.10.3
         
   router5:
     image: dockernet
@@ -83,6 +101,9 @@ services:
         ipv4_address: 10.10.8.3
       net9:
         ipv4_address: 10.10.9.3
+      net11:
+        ipv4_address: 10.10.11.3
+
 networks:
   net1:
     driver: bridge
@@ -129,3 +150,13 @@ networks:
     ipam:
       config:
         - subnet: 10.10.9.0/24
+  net10:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  net11:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.11.0/24

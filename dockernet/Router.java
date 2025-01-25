@@ -1,4 +1,3 @@
-// 디스턴스 벡터 방식으로 업데이트된 Router 클래스
 package dockernet;
 
 import java.net.*;
@@ -33,7 +32,7 @@ public class Router extends NetworkDevice {
     // 자신으로 라우팅 테이블을 초기화
     private void initializeRoutingTable() {
         for (String ip : getIPAddresses()) {
-            addRoute(ip, 0, ip); // 자신의 IP는 거리 0으로 추가
+            addRoute(ip, 0, 0, ip); // 자신의 IP는 거리 0, 홉 0으로 추가
         }
     }
     
@@ -55,7 +54,6 @@ public class Router extends NetworkDevice {
                 if (broadcastAddress != null) {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, BROADCAST_PORT);
                     socket.send(packet);
-                    // System.out.println("Routing table broadcast sent from " + ip + " to " + broadcastAddress.getHostAddress());
                 }
             }
         } catch (Exception e) {
@@ -72,7 +70,6 @@ public class Router extends NetworkDevice {
             while (true) {
                 socket.receive(packet);
                 String message = new String(packet.getData(), 0, packet.getLength());
-                // System.out.println("Received raw message: [" + message + "]");
                 String sourceIP = packet.getAddress().getHostAddress();
     
                 // 자신의 IP에서 온 메시지는 무시
@@ -80,7 +77,7 @@ public class Router extends NetworkDevice {
                     continue;
                 }
     
-                // 빈 메시지는 기본적으로 무시하지만, 디버깅 로그 추가
+                // 빈 메시지는 기본적으로 무시
                 if (message.isEmpty()) {
                     System.err.println("Received an empty message, ignoring.");
                     continue;
@@ -110,23 +107,27 @@ public class Router extends NetworkDevice {
         String[] entries = tableData.split(",");
         for (String entry : entries) {
             String[] parts = entry.split(":");
-            if (parts.length != 2) {
+            if (parts.length != 3) {
                 System.err.println("Malformed routing table entry: " + entry);
                 continue;
             }
     
             String destination = parts[0];
             int distance;
+            int hops;
             try {
                 distance = Integer.parseInt(parts[1]);
+                hops = Integer.parseInt(parts[2]);
             } catch (NumberFormatException e) {
-                System.err.println("Invalid distance value for entry: " + entry);
+                System.err.println("Invalid distance or hops value for entry: " + entry);
                 continue;
             }
     
             // 기존 정보와 비교하여 더 짧은 경로로 업데이트
-            if (!routingTable.containsKey(destination) || routingTable.get(destination).getDistance() > distance + 1) {
-                addRoute(destination, distance + 1, sourceIP);
+            int newDistance = distance + this.delay; // 누적 딜레이 반영
+            int newHops = hops + 1; // 홉 수 증가
+            if (!routingTable.containsKey(destination) || routingTable.get(destination).getDistance() > newDistance) {
+                addRoute(destination, newDistance, newHops, sourceIP);
             }
         }
     }    
@@ -134,7 +135,6 @@ public class Router extends NetworkDevice {
     // 라우팅 테이블 직렬화
     private String serializeRoutingTable() {
         if (routingTable.isEmpty()) {
-            // 라우팅 테이블이 비어 있을 경우, 자신의 서브넷 정보만 포함
             return "ROUTING_TABLE;" + String.join(",", getIPAddresses());
         }
         StringBuilder sb = new StringBuilder("ROUTING_TABLE;");
@@ -142,6 +142,8 @@ public class Router extends NetworkDevice {
             sb.append(entry.getKey())
               .append(":")
               .append(entry.getValue().getDistance())
+              .append(":")
+              .append(entry.getValue().getHops())
               .append(",");
         }
         return sb.toString();
@@ -159,20 +161,16 @@ public class Router extends NetworkDevice {
     }
 
     // 라우팅 테이블에 경로 추가
-    private void addRoute(String destination, int distance, String nextHop) {
+    private void addRoute(String destination, int distance, int hops, String nextHop) {
         synchronized (routingTable) { // 동기화를 통해 다중 스레드 환경에서 안전하게 작업
             if (routingTable.containsKey(destination)) {
-                // 기존 경로가 더 짧으면 업데이트하지 않음
                 int currentDistance = routingTable.get(destination).getDistance();
                 if (distance >= currentDistance) {
-                    System.out.println("Route to " + destination + " via " + nextHop + " ignored. Current distance: " + currentDistance + ", New distance: " + distance);
                     return;
                 }
             }
-
-            // 경로를 라우팅 테이블에 추가 또는 갱신
-            routingTable.put(destination, new RouteInfo(distance, nextHop));
-            System.out.println("Route added/updated: " + destination + " via " + nextHop + " with distance " + distance);
+            routingTable.put(destination, new RouteInfo(distance, hops, nextHop));
+            System.out.println("Route added/updated: " + destination + " via " + nextHop + " with distance " + distance + " and hops " + hops);
         }
     }
 
@@ -192,9 +190,9 @@ public class Router extends NetworkDevice {
                 return;
             }
 
-            System.out.println("Destination\tDistance\tNext Hop");
+            System.out.println("Destination\tDistance\tHops\tNext Hop");
             for (Map.Entry<String, RouteInfo> entry : routingTable.entrySet()) {
-                System.out.println(entry.getKey() + "\t\t" + entry.getValue().getDistance() + "\t\t" + entry.getValue().getNextHop());
+                System.out.println(entry.getKey() + "\t\t" + entry.getValue().getDistance() + "\t\t" + entry.getValue().getHops() + "\t\t" + entry.getValue().getNextHop());
             }
         }
     }
@@ -202,15 +200,21 @@ public class Router extends NetworkDevice {
     // 라우팅 정보 클래스
     private static class RouteInfo {
         private final int distance;
+        private final int hops;
         private final String nextHop;
 
-        public RouteInfo(int distance, String nextHop) {
+        public RouteInfo(int distance, int hops, String nextHop) {
             this.distance = distance;
+            this.hops = hops;
             this.nextHop = nextHop;
         }
 
         public int getDistance() {
             return distance;
+        }
+
+        public int getHops() {
+            return hops;
         }
 
         public String getNextHop() {

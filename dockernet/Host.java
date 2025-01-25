@@ -1,5 +1,5 @@
 package dockernet;
 
-public class Host extends NetworkDevice {
+public class Host extends Router {
     
 }
