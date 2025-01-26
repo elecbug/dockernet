@@ -1,4 +1,4 @@
-package dockernet.src.elecbug;
+package dockernet;
 
 class RouteInfo {
     private final int distance;

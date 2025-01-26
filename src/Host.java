@@ -1,4 +1,4 @@
-package dockernet.src.elecbug;
+package dockernet;
 
 class Host extends NetworkDevice {
     

@@ -4,7 +4,7 @@ setup:
 	sudo apt install docker-compose -y || true
 
 build:
-	javac -source 21 -target 21 src/elecbug/App.java -d bin
+	javac -source 21 -target 21 src/App.java -d bin
 	sudo docker build . -t dockernet
 
 up:

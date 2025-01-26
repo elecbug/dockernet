@@ -1,4 +1,4 @@
-package dockernet.src.elecbug;
+package dockernet;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;

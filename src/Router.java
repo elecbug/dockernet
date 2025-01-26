@@ -1,4 +1,4 @@
-package dockernet.src.elecbug;
+package dockernet;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
