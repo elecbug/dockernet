@@ -1,5 +1,3 @@
-package dockernet;
-
 public class App {
     public static void main(String args[]) {
         if (args.length != 1) {

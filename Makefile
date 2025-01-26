@@ -4,7 +4,7 @@ setup:
 	sudo apt install docker-compose -y || true
 
 build:
-	javac -source 21 -target 21 src/App.java -d bin
+	javac src/* -d bin
 	sudo docker build . -t dockernet
 
 up:
@@ -15,3 +15,6 @@ up:
 down:
 	sudo docker-compose down
 	sudo rm -rf ./data
+
+test:
+	curl -X POST "http://localhost:8080/send-packet" -d "destination=10.10.2.2&payload=Hello"

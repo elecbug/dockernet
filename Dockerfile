@@ -14,8 +14,8 @@ RUN apt install openjdk-21-jre -y
 
 ENV DEVICE=null
 
-RUN mkdir /app
-COPY bin/dockernet /app/dockernet
-WORKDIR /app
+RUN mkdir -p /app/dockernet && mkdir -p /app/data
+COPY bin/* /app/dockernet/
+WORKDIR /app/dockernet
 
-CMD java dockernet.Program $DEVICE > /app/data/$HOSTNAME.log
+CMD java App $DEVICE #> /app/data/$HOSTNAME.log

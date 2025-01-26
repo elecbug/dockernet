@@ -1,5 +1,3 @@
-package dockernet;
-
 class RouteInfo {
     private final int distance;
     private final int hops;

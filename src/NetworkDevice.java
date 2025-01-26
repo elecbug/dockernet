@@ -1,5 +1,3 @@
-package dockernet;
-
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -7,8 +5,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-class NetworkDevice {
-    protected List<String> ipAddresses; // 실제 IP 주소 목록
+abstract class NetworkDevice implements IRunnerable {
+    protected static final int HTTP_PORT = 8080; // HTTP 서버 포트
+    protected static final int ROUTING_BROADCAST_PORT = 5000; // 라우터 브로드캐스트 수신 포트
+    protected static final int PACKET_RECEIVE_PORT = 6000; // 라우터가 듣는 포트
+
+    private List<String> ipAddresses; // 실제 IP 주소 목록
 
     public NetworkDevice() {
         this.ipAddresses = new ArrayList<>();
@@ -46,9 +48,5 @@ class NetworkDevice {
     // 현재 IP 주소 목록 반환
     public List<String> getIPAddresses() {
         return this.ipAddresses;
-    }
-
-    public void run() {
-
     }
 }
