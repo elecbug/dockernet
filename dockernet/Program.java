@@ -1,11 +1,7 @@
 package dockernet;
 
-import dockernet.*;
-
 public class Program
 {
-    private static NetworkDevice device;
-
     public static void main(String args[])
     {
         if (args.length != 1) {
@@ -14,10 +10,10 @@ public class Program
 
         switch(args[0].toLowerCase()) {
             case "host": 
-                Program.device = new Host();
+                new Host().run();
                 break;
             case "router": 
-                Program.device = new Router();
+                new Router().run();
                 break;
         }
     }

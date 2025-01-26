@@ -1,7 +1,11 @@
 package dockernet;
 
-import java.net.*;
-import java.util.*;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 public class NetworkDevice {
     protected List<String> ipAddresses; // 실제 IP 주소 목록
@@ -50,5 +54,9 @@ public class NetworkDevice {
         for (String ip : this.ipAddresses) {
             System.out.println(ip);
         }
+    }
+
+    public void run() {
+
     }
 }
