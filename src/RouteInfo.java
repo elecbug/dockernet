@@ -1,4 +1,4 @@
-class RouteInfo {
+public class RouteInfo {
     private final int distance;
     private final int hops;
     private final String nextHop;

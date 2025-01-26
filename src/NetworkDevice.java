@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-abstract class NetworkDevice implements IRunnerable {
+public abstract class NetworkDevice implements IRunnerable {
     protected static final int HTTP_PORT = 8080; // HTTP 서버 포트
     protected static final int ROUTING_BROADCAST_PORT = 5000; // 라우터 브로드캐스트 수신 포트
     protected static final int PACKET_RECEIVE_PORT = 6000; // 라우터가 듣는 포트

@@ -4,7 +4,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-class RoutingTable {
+public class RoutingTable {
     public static final String ROUTING_TABLE_PREFIX = "ROUTING_TABLE;";
 
     private Map<String, RouteInfo> table;

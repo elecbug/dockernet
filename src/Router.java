@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-class Router extends NetworkDevice {
+public class Router extends NetworkDevice {
     private static final int BROADCAST_INTERVAL = 5; // 라우팅 테이블 브로드캐스트 간격
 
     private RoutingTable routingTable; // 라우팅 테이블
