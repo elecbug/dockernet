@@ -1,9 +1,7 @@
-package dockernet;
+package dockernet.src.elecbug;
 
-public class Program
-{
-    public static void main(String args[])
-    {
+public class App {
+    public static void main(String args[]) {
         if (args.length != 1) {
             System.out.println("Need one args [host|router|switch]");
         }

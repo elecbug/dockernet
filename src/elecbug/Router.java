@@ -1,21 +1,21 @@
-package dockernet;
+package dockernet.src.elecbug;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Router extends NetworkDevice {
-    private Map<String, RouteInfo> routingTable; // 라우팅 테이블
+class Router extends NetworkDevice {
     private static final int BROADCAST_PORT = 5000; // 브로드캐스트 통신 포트
-    private final int delay; // 응답 딜레이(ms)
+    private static final int BROADCAST_INTERVAL = 5; // 라우팅 테이블 브로드캐스트 간격
+
+    private RoutingTable routingTable; // 라우팅 테이블
     private final ScheduledExecutorService scheduler; // 주기적인 브로드캐스트 및 업데이트를 위한 스케줄러
-    private final int SYNC_INTERVAL = 5;
+    private final int delay; // 응답 딜레이(ms)
 
     public Router() {
         this(new Random().nextInt(900) + 100); // 100~999ms 랜덤 딜레이
@@ -23,29 +23,28 @@ public class Router extends NetworkDevice {
 
     public Router(int delay) {
         super();
-        this.routingTable = new ConcurrentHashMap<>();
+        this.routingTable = new RoutingTable();
         this.delay = delay;
         this.scheduler = Executors.newScheduledThreadPool(2);
+    }
 
+    @Override
+    public void run() {
         initializeRoutingTable();
-
-        // 초기 브로드캐스트 및 업데이트 시작
         startBroadcastingAndListening();
-
-        // 라우터 학습 및 로그 저장 반복
         startLearningAndLogging();
     }
 
     // 자신으로 라우팅 테이블을 초기화
     private void initializeRoutingTable() {
         for (String ip : getIPAddresses()) {
-            addRoute(ip, 0, 0, ip); // 자신의 IP는 거리 0, 홉 0으로 추가
+            routingTable.addRoutingPath(ip, 0, 0, ip); // 자신의 IP는 거리 0, 홉 0으로 추가
         }
     }
     
     // 브로드캐스트 및 수신 작업 시작
     private void startBroadcastingAndListening() {
-        scheduler.scheduleAtFixedRate(this::sendRoutingTable, 0, SYNC_INTERVAL, TimeUnit.SECONDS); // 10초 간격으로 브로드캐스트
+        scheduler.scheduleAtFixedRate(this::sendRoutingTable, 0, BROADCAST_INTERVAL, TimeUnit.SECONDS); // 10초 간격으로 브로드캐스트
         new Thread(this::listenForBroadcast).start(); // 브로드캐스트 수신
     }
 
@@ -53,7 +52,7 @@ public class Router extends NetworkDevice {
     private void sendRoutingTable() {
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setBroadcast(true);
-            String tableData = serializeRoutingTable();
+            String tableData = routingTable.serialize(getIPAddresses());
             byte[] buffer = tableData.getBytes();
 
             for (String ip : getIPAddresses()) {
@@ -133,27 +132,10 @@ public class Router extends NetworkDevice {
             // 기존 정보와 비교하여 더 짧은 경로로 업데이트
             int newDistance = distance + this.delay; // 누적 딜레이 반영
             int newHops = hops + 1; // 홉 수 증가
-            if (!routingTable.containsKey(destination) || routingTable.get(destination).getDistance() > newDistance) {
-                addRoute(destination, newDistance, newHops, sourceIP);
+            if (!routingTable.containsKey(destination) || routingTable.getDistance(destination) > newDistance) {
+                routingTable.addRoutingPath(destination, newDistance, newHops, sourceIP);
             }
         }
-    }    
-
-    // 라우팅 테이블 직렬화
-    private String serializeRoutingTable() {
-        if (routingTable.isEmpty()) {
-            return "ROUTING_TABLE;" + String.join(",", getIPAddresses());
-        }
-        StringBuilder sb = new StringBuilder("ROUTING_TABLE;");
-        for (Map.Entry<String, RouteInfo> entry : routingTable.entrySet()) {
-            sb.append(entry.getKey())
-              .append(":")
-              .append(entry.getValue().getDistance())
-              .append(":")
-              .append(entry.getValue().getHops())
-              .append(",");
-        }
-        return sb.toString();
     }    
 
     // 브로드캐스트 주소 계산
@@ -167,69 +149,22 @@ public class Router extends NetworkDevice {
         }
     }
 
-    // 라우팅 테이블에 경로 추가
-    private void addRoute(String destination, int distance, int hops, String nextHop) {
-        synchronized (routingTable) { // 동기화를 통해 다중 스레드 환경에서 안전하게 작업
-            if (routingTable.containsKey(destination)) {
-                int currentDistance = routingTable.get(destination).getDistance();
-                if (distance >= currentDistance) {
-                    return;
-                }
-            }
-            routingTable.put(destination, new RouteInfo(distance, hops, nextHop));
-            System.out.println("Route added/updated: " + destination + " via " + nextHop + " with distance " + distance + " and hops " + hops);
-        }
-    }
-
     // 라우팅 테이블 주기적으로 출력
     private void startLearningAndLogging() {
         scheduler.scheduleAtFixedRate(() -> {
             System.out.println("\n[Router Update] Current Routing Table:");
-            printRoutingTable();
+            synchronized (routingTable) {
+                if (routingTable.isEmpty()) {
+                    System.out.println("Routing table is empty.");
+                    return;
+                }
+    
+                System.out.printf("%-20s %-10s %-10s %-20s\n", "Destination", "Distance", "Hops", "Next Hop");
+                for (Map.Entry<String, RouteInfo> entry : routingTable.entrySet()) {
+                    System.out.printf("%-20s %-10d %-10d %-20s\n", 
+                        entry.getKey(), entry.getValue().getDistance(), entry.getValue().getHops(), entry.getValue().getNextHop());
+                }
+            }
         }, 0, 10, TimeUnit.SECONDS);
-    }
-
-    // 라우팅 테이블 출력
-    private void printRoutingTable() {
-        synchronized (routingTable) {
-            if (routingTable.isEmpty()) {
-                System.out.println("Routing table is empty.");
-                return;
-            }
-
-            System.out.printf("%-20s %-10s %-10s %-20s\n", "Destination", "Distance", "Hops", "Next Hop");
-            for (Map.Entry<String, RouteInfo> entry : routingTable.entrySet()) {
-                System.out.printf("%-20s %-10d %-10d %-20s\n", 
-                                entry.getKey(), 
-                                entry.getValue().getDistance(), 
-                                entry.getValue().getHops(), 
-                                entry.getValue().getNextHop());
-            }
-        }
-    }
-
-    // 라우팅 정보 클래스
-    private static class RouteInfo {
-        private final int distance;
-        private final int hops;
-        private final String nextHop;
-
-        public RouteInfo(int distance, int hops, String nextHop) {
-            this.distance = distance;
-            this.hops = hops;
-            this.nextHop = nextHop;
-        }
-
-        public int getDistance() {
-            return distance;
-        }
-
-        public int getHops() {
-            return hops;
-        }
-
-        public String getNextHop() {
-            return nextHop;
-        }
     }
 }

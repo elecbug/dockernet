@@ -1,4 +1,4 @@
-package dockernet;
+package dockernet.src.elecbug;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-public class NetworkDevice {
+class NetworkDevice {
     protected List<String> ipAddresses; // 실제 IP 주소 목록
 
     public NetworkDevice() {
@@ -46,14 +46,6 @@ public class NetworkDevice {
     // 현재 IP 주소 목록 반환
     public List<String> getIPAddresses() {
         return this.ipAddresses;
-    }
-
-    // 디버깅용: IP 주소 출력
-    public void printIPAddresses() {
-        System.out.println("IP Addresses for this container:");
-        for (String ip : this.ipAddresses) {
-            System.out.println(ip);
-        }
     }
 
     public void run() {
