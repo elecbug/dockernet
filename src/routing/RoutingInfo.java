@@ -1,9 +1,11 @@
-public class RouteInfo {
+package routing;
+
+public class RoutingInfo {
     private final int distance;
     private final int hops;
     private final String nextHop;
 
-    public RouteInfo(int distance, int hops, String nextHop) {
+    public RoutingInfo(int distance, int hops, String nextHop) {
         this.distance = distance;
         this.hops = hops;
         this.nextHop = nextHop;

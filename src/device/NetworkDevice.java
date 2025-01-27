@@ -1,3 +1,5 @@
+package device;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -48,5 +50,16 @@ public abstract class NetworkDevice implements IRunnerable {
     // 현재 IP 주소 목록 반환
     public List<String> getIPAddresses() {
         return this.ipAddresses;
+    }
+
+    // 브로드캐스트 주소 계산
+    protected InetAddress getBroadcastAddress(String ip) {
+        try {
+            String[] parts = ip.split("\\.");
+            return InetAddress.getByName(parts[0] + "." + parts[1] + "." + parts[2] + ".255");
+        } catch (Exception e) {
+            System.err.println("Error calculating broadcast address for " + ip + ": " + e.getMessage());
+            return null;
+        }
     }
 }

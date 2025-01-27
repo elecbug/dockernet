@@ -1,3 +1,5 @@
+package device;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,10 +11,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import routing.RoutingInfo;
+import routing.RoutingPacket;
+import routing.RoutingTable;
+
 public class Router extends NetworkDevice {
     private static final int BROADCAST_INTERVAL = 5; // 라우팅 테이블 브로드캐스트 간격
 
-    private RoutingTable routingTable; // 라우팅 테이블
+    private final RoutingTable routingTable; // 라우팅 테이블
     private final ScheduledExecutorService scheduler; // 주기적인 브로드캐스트 및 업데이트를 위한 스케줄러
     private final int delay; // 응답 딜레이(ms)
 
@@ -52,7 +58,7 @@ public class Router extends NetworkDevice {
     private void sendRoutingTable() {
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setBroadcast(true);
-            String tableData = routingTable.serialize(getIPAddresses());
+            String tableData = RoutingPacket.create(routingTable, getIPAddresses());
             byte[] buffer = tableData.getBytes();
 
             for (String ip : getIPAddresses()) {
@@ -75,6 +81,7 @@ public class Router extends NetworkDevice {
     
             while (true) {
                 socket.receive(packet);
+
                 String message = new String(packet.getData(), 0, packet.getLength());
                 String sourceIP = packet.getAddress().getHostAddress();
     
@@ -106,6 +113,7 @@ public class Router extends NetworkDevice {
 
                 while (true) {
                     socket.receive(packet);
+
                     String message = new String(packet.getData(), 0, packet.getLength());
                     String sourceIP = packet.getAddress().getHostAddress();
 
@@ -113,7 +121,7 @@ public class Router extends NetworkDevice {
 
                     // 패킷 해석 및 다음 홉으로 전달
                     String destinationIP = extractDestinationIP(message);
-                    RouteInfo route = routingTable.get(destinationIP);
+                    RoutingInfo route = routingTable.get(destinationIP);
 
                     if (route != null) {
                         forwardPacket(message, route.getNextHop());
@@ -132,8 +140,10 @@ public class Router extends NetworkDevice {
         try {
             // 쿼리 문자열 분리
             String[] pairs = queryString.split("&");
+
             for (String pair : pairs) {
                 String[] keyValue = pair.split("=");
+
                 if (keyValue.length == 2) {
                     String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8.name());
                     String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8.name());
@@ -155,10 +165,10 @@ public class Router extends NetworkDevice {
     // 패킷 전달
     private void forwardPacket(String packet, String nextHop) {
         try (DatagramSocket socket = new DatagramSocket()) {
-            InetAddress nextHopAddress = InetAddress.getByName(nextHop);
             byte[] buffer = packet.getBytes();
-
+            InetAddress nextHopAddress = InetAddress.getByName(nextHop);
             DatagramPacket forwardPacket = new DatagramPacket(buffer, buffer.length, nextHopAddress, PACKET_RECEIVE_PORT);
+
             socket.send(forwardPacket);
 
             System.out.println("Forwarded packet: " + packet + " to " + nextHop);
@@ -167,21 +177,11 @@ public class Router extends NetworkDevice {
         }
     }
 
-    // 브로드캐스트 주소 계산
-    private InetAddress getBroadcastAddress(String ip) {
-        try {
-            String[] parts = ip.split("\\.");
-            return InetAddress.getByName(parts[0] + "." + parts[1] + "." + parts[2] + ".255");
-        } catch (Exception e) {
-            System.err.println("Error calculating broadcast address for " + ip + ": " + e.getMessage());
-            return null;
-        }
-    }
-
     // 라우팅 테이블 주기적으로 출력
     private void startLearningAndLogging() {
         scheduler.scheduleAtFixedRate(() -> {
             System.out.println("\n[Router Update] Current Routing Table:");
+
             synchronized (routingTable) {
                 if (routingTable.isEmpty()) {
                     System.out.println("Routing table is empty.");
@@ -189,7 +189,8 @@ public class Router extends NetworkDevice {
                 }
     
                 System.out.printf("%-20s %-10s %-10s %-20s\n", "Destination", "Distance", "Hops", "Next Hop");
-                for (Map.Entry<String, RouteInfo> entry : routingTable.entrySet()) {
+            
+                for (Map.Entry<String, RoutingInfo> entry : routingTable.entrySet()) {
                     System.out.printf("%-20s %-10d %-10d %-20s\n", 
                         entry.getKey(), entry.getValue().getDistance(), entry.getValue().getHops(), entry.getValue().getNextHop());
                 }
